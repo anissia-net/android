@@ -1,43 +1,40 @@
 package anissia.android
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import anissia.android.ui.theme.AnissiaAndroidTheme
+import androidx.activity.OnBackPressedCallback
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 
 class MainActivity : ComponentActivity() {
+    private val webview: WebViewEx by lazy {
+        findViewById<WebViewEx>(R.id.webview)
+    }
+
+    private val swipeRefreshLayout: SwipeRefreshLayout by lazy {
+        findViewById<SwipeRefreshLayout>(R.id.swipeRefreshLayout)
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent {
-            AnissiaAndroidTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    Greeting("Android")
+        setContentView(R.layout.webview)
+
+        webview.loadUrl(webview.basicUrl)
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (webview.canGoBack()) {
+                    webview.goBack()
+                } else {
+                    finish()
                 }
             }
+        })
+
+        swipeRefreshLayout.setOnRefreshListener {
+            webview.reload()
+            swipeRefreshLayout.isRefreshing = false
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    AnissiaAndroidTheme {
-        Greeting("Android")
     }
 }
