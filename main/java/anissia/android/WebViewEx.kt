@@ -1,20 +1,16 @@
 package anissia.android
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.Context
-import android.content.Context.VIBRATOR_SERVICE
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
-import android.os.VibrationEffect
-import android.os.Vibrator
-import android.os.VibratorManager
 import android.util.AttributeSet
 import android.view.KeyEvent
-import android.webkit.*
+import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
 
 @SuppressLint("SetJavaScriptEnabled")
 class WebViewEx : WebView {
@@ -70,17 +66,7 @@ class WebViewEx : WebView {
             textZoom = textZoom(0, false)
         }
 
-        // alert 설정
-        webChromeClient = object: WebChromeClient() {
-            override fun onJsAlert(view: WebView?, url: String?, message: String?, result: JsResult?): Boolean {
-                AlertDialog.Builder(context).create().apply {
-                    setMessage(message)
-                    setButton(AlertDialog.BUTTON_POSITIVE, "OK") { dialog, which -> dialog.dismiss() }
-                    show()
-                }
-                return false
-            }
-        }
+        webChromeClient = object: WebChromeClient() {}
 
         // WebViewClient 설정
         setWebViewClient(object: WebViewClient() {
