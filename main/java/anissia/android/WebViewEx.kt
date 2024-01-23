@@ -10,12 +10,13 @@ import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startActivity
 
 @SuppressLint("SetJavaScriptEnabled")
 class WebViewEx : WebView {
     val basicUrl = "https://anissia.net/"
     //val basicUrl = "http://192.168.1.2:5173/"
+    var schedule = "${basicUrl}schedule"
 
     var versionName: String = ""
     var firstLoad: Boolean = true
@@ -86,15 +87,25 @@ class WebViewEx : WebView {
 
             private fun handleUrl(url: Uri): Boolean {
                 val urls = url.toString()
-                if (urls.startsWith(basicUrl)) {
+                // 애니시아 주소가 아니거나 애니편성표의 경우 외부 실행
+                if (urls.startsWith(basicUrl) && !urls.startsWith(schedule)) {
                     return false
                 }
                 return openExternalBrowser(url)
             }
 
             private fun openExternalBrowser(url: Uri): Boolean {
+                // 애니편성표 2015의 경우 전용앱이 있다면 앱을 실행시킨다.
+                if (url.toString().startsWith("${schedule}/2015")) {
+                    val intent = context.packageManager.getLaunchIntentForPackage("anissia.android.schedule")
+                    if (intent != null) {
+                        startActivity(context, intent, null)
+                        return true
+                    }
+                }
+
                 val intent = Intent(Intent.ACTION_VIEW, url)
-                ContextCompat.startActivity(context, intent, null)
+                startActivity(context, intent, null)
                 return true
             }
         })
